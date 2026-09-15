@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#c8a55b">
+    <title>HiAce Express | Premium Travel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        :root {
+            --primary: #c8a55b;
+            --primary-dark: #b8923a;
+            --primary-light: #d4b87a;
+            --dark: #0a0a0a;
+            --dark-gray: #111111;
+            --light-gray: #1a1a2e;
+            --card-bg: #1e1e2a;
+            --text-muted: #888888;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --cash-blue: #3b82f6;
+            --border: rgba(200, 165, 91, 0.2);
+            --departed: #6b7280;
+        }
+
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e, #0f0f23);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .welcome-screen.hidden {
+            display: none;
+        }
+
+        .welcome-logo {
+            width: 100px;
+            height: 100px;
+            background: rgba(200, 165, 91, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            border: 2px solid rgba(200, 165, 91, 0.5);
+        }
+
+        .welcome-logo i {
+            font-size: 3rem;
+            color: var(--primary);
+        }
+
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .app-sub {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .explore-btn {
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--dark);
+            min-height: 100vh;
+            position: relative;
+            display: none;
+        }
+
+        .app-container.show {
+            display: block;
+        }
+
+        .status-bar {
+            background: var(--dark-gray);
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .real-time {
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .header {
+            background: var(--dark-gray);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo p {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .settings-icon,
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            background: var(--light-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid var(--border);
+        }
+
+        .settings-icon i,
+        .user-avatar i {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .route-banner {
+            background: linear-gradient(135deg, var(--light-gray), var(--dark-gray));
+            margin: 0.8rem;
+            border-radius: 20px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        .route-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .route-point h3 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .route-point p {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+
+        .route-badge {
+            background: rgba(200, 165, 91, 0.15);
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: var(--primary);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.6rem 1rem;
+            border-top: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .nav-item {
+            text-align: center;
+            cursor: pointer;
+            padding: 0.3rem 0;
+            border-radius: 12px;
+            flex: 1;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .nav-item span {
+            display: block;
+            font-size: 0.6rem;
+            margin-top: 0.2rem;
+            color: var(--text-muted);
+        }
+
+        .nav-item.active i,
+        .nav-item.active span {
+            color: var(--primary);
+        }
+
+        .main-content {
+            padding-bottom: 70px;
+            padding-top: 0.5rem;
+        }
+
+        .date-scroll {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 0 1rem 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .date-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .date-items {
+            display: inline-flex;
+            gap: 0.5rem;
+        }
+
+        .date-item {
+            background: var(--light-gray);
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid var(--border);
+        }
+
+        .date-item.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--dark);
+        }
+
+        .date-day {
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .date-num {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .vehicle-card {
+            background: var(--light-gray);
+            margin: 0.8rem 1rem;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .vehicle-card.departed {
+            opacity: 0.6;
+            filter: grayscale(0.3);
+        }
+
+        .vehicle-time {
+            background: var(--dark-gray);
+            padding: 0.6rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .vehicle-time h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .vehicle-time span {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .departed-badge {
+            background: rgba(107, 114, 128, 0.3);
+            color: var(--departed);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 700;
+        }
+
+        .vehicle-details {
+            padding: 1rem;
+        }
+
+        .vehicle-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .vehicle-price {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .btn-select {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--dark);
+            border: none;
+            padding: 0.7rem;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-select:disabled {
+            background: var(--dark-gray);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .hiace-wrapper {
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            border-radius: 20px;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .hiace-legend {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-dot.available {
+            background: var(--success);
+        }
+
+        .legend-dot.pending {
+            background: var(--warning);
+        }
+
+        .legend-dot.booked {
+            background: var(--danger);
+        }
+
+        .hiace-body {
+            background: linear-gradient(180deg, #2a2a3e 0%, #1e1e30 100%);
+            border-radius: 16px 16px 12px 12px;
+            border: 2px solid rgba(200, 165, 91, 0.25);
+            padding: 0.8rem;
+        }
+
+        .hiace-front {
+            background: linear-gradient(180deg, #0a0a1a, #1a1a2e);
+            border-radius: 10px 10px 0 0;
+            padding: 0.5rem;
+            margin-bottom: 0.6rem;
+            border: 1px solid rgba(200, 165, 91, 0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .windshield {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(100, 180, 255, 0.08), rgba(100, 180, 255, 0.03));
+            border: 1px solid rgba(100, 180, 255, 0.2);
+            border-radius: 12px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: rgba(100, 180, 255, 0.7);
+            letter-spacing: 3px;
+        }
+
+        .seat-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .seat-3d {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .seat-3d.available {
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.25), rgba(16, 185, 129, 0.12));
+            border: 2px solid var(--success);
+            color: var(--success);
+            cursor: pointer;
+        }
+
+        .seat-3d.available:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .seat-3d.pending {
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.25), rgba(245, 158, 11, 0.12));
+            border: 2px solid var(--warning);
+            color: var(--warning);
+            cursor: not-allowed;
+        }
+
+        .seat-3d.booked {
+            background: linear-gradient(180deg, rgba(239, 68, 68, 0.25), rgba(239, 68, 68, 0.12));
+            border: 2px solid var(--danger);
+            color: var(--danger);
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .seat-3d.selected {
+            background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            border: 2px solid #fff;
+            color: var(--dark);
+            transform: scale(1.05);
+        }
+
+        .seat-num {
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        .seat-lbl {
+            font-size: 0.55rem;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .driver-area {
+            background: rgba(200, 165, 91, 0.15);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            text-align: center;
+            border: 1px solid rgba(200, 165, 91, 0.3);
+        }
+
+        .driver-area i {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-right: 0.3rem;
+        }
+
+        .driver-area span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--light-gray);
+            width: 90%;
+            max-width: 450px;
+            border-radius: 28px;
+            padding: 1.5rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--dark-gray);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .input-group input.error {
+            border-color: var(--danger);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.6rem;
+            margin-top: 0.2rem;
+            display: block;
+        }
+
+        .payment-options {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .payment-btn {
+            background: var(--dark-gray);
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            border-radius: 30px;
+            text-align: center;
+            cursor: pointer;
+            flex: 1;
+            font-size: 0.7rem;
+        }
+
+        .payment-btn.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--dark);
+        }
+
+        .cash-option {
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .btn-confirm {
+            width: 100%;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 0.8rem;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            background: var(--dark-gray);
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 0.8rem;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .points-badge {
+            background: linear-gradient(135deg, rgba(200, 91, 91, 0.2), rgba(200, 165, 91, 0.08));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 0.8rem 1rem;
+            margin: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .points-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .ticket-card {
+            background: linear-gradient(135deg, #1e1e30, #161625);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 0.8rem 1rem;
+        }
+
+        .ticket-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ticket-seat-badge {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .ticket-body {
+            padding: 1rem;
+        }
+
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .ticket-label {
+            color: var(--text-muted);
+        }
+
+        .ticket-value {
+            font-weight: 600;
+        }
+
+        .ticket-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 1rem 1rem;
+        }
+
+        .btn-print {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-download {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .btn-cancel {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .settings-menu {
+            background: var(--light-gray);
+            margin: 1rem;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .settings-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+        }
+
+        .settings-item i {
+            width: 30px;
+            color: var(--primary);
+        }
+
+        .danger-item {
+            color: var(--danger);
+        }
+
+        .danger-item i {
+            color: var(--danger);
+        }
+
+        .version-text {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark-gray);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            z-index: 2000;
+            font-size: 0.75rem;
+            display: none;
+            border-left: 3px solid var(--primary);
+        }
+
+        .cancel-detail {
+            background: var(--dark-gray);
+            padding: 1rem;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .cancel-detail hr {
+            border-color: var(--border);
+            margin: 0.5rem 0;
+        }
+
+        .payment-modal-icon {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-instruction {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .payment-details-card {
+            background: var(--dark-gray);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .payment-details-card .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            font-size: 0.8rem;
+        }
+
+        .payment-form-fields {
+            margin-top: 1rem;
+        }
+
+        .thankyou-message {
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: rgba(200, 165, 91, 0.1);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            color: var(--primary);
+        }
+
+        @media (max-width:500px) {
+            .seat-3d {
+                width: 48px;
+                height: 48px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="welcomeScreen" class="welcome-screen">
+        <div class="welcome-logo"><i class="fas fa-bus"></i></div>
+        <div class="app-title">HiAce Express</div>
+        <div class="app-sub">Premium Travel • Book Your Seat</div>
+        <button class="explore-btn" onclick="startApp()">Explore Services →</button>
+    </div>
+
+    <div id="appContainer" class="app-container">
+        <div class="status-bar"><span class="real-time" id="realTimeClock">--:-- --</span><span>● Live</span></div>
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>HiAce<span>Express</span></h1>
+                    <p>Nepalgunj → Butwal</p>
+                </div>
+                <div class="header-icons">
+                    <div class="settings-icon" onclick="openSettings()"><i class="fas fa-sliders-h"></i></div>
+                    <div class="user-avatar" onclick="showProfile()"><i class="fas fa-user"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="route-banner">
+            <div class="route-info">
+                <div class="route-point">
+                    <h3>Nepalgunj</h3>
+                    <p>Departure</p>
+                </div>
+                <i class="fas fa-arrow-right" style="color:var(--primary);"></i>
+                <div class="route-point">
+                    <h3>Butwal</h3>
+                    <p>Arrival</p>
+                </div>
+            </div>
+            <div class="route-badge"><i class="fas fa-clock"></i> 6 Hrs | NPR 800</div>
+        </div>
+        <div class="main-content" id="mainContent">
+            <div style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin"
+                    style="color:var(--primary);"></i></div>
+        </div>
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('booking',event)"><i
+                    class="fas fa-calendar-alt"></i><span>Book</span></div>
+            <div class="nav-item" onclick="switchTab('mybookings',event)"><i class="fas fa-ticket-alt"></i><span>My
+                    Trips</span></div>
+            <div class="nav-item" onclick="openSupport()"><i class="fas fa-headset"></i><span>Support</span></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2><button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
+            </div>
+            <div class="settings-menu">
+                <div class="settings-item" onclick="showChangePassword()"><i class="fas fa-key"></i>
+                    <div>
+                        <div>Change Password</div>
+                        <div style="font-size:0.6rem;color:#888;">Update your account password</div>
+                    </div><i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="settings-item" onclick="showAdminLogin()"><i class="fas fa-shield-alt"></i>
+                    <div>
+                        <div>Administrator</div>
+                        <div style="font-size:0.6rem;color:#888;">Access control panel</div>
+                    </div><i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="settings-item danger-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i>
+                    <div>
+                        <div>Logout</div>
+                        <div style="font-size:0.6rem;color:#888;">Sign out from your account</div>
+                    </div>
+                </div>
+            </div>
+            <div class="version-text">Version 3.0 | HiAce Express</div>
+        </div>
+    </div>
+
+    <div id="changePwdModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Change Password</h2><button class="modal-close"
+                    onclick="closeModal('changePwdModal')">&times;</button>
+            </div>
+            <div class="input-group"><label>Current Password</label><input type="password" id="oldPwd"></div>
+            <div class="input-group"><label>New Password</label><input type="password" id="newPwd"></div>
+            <div class="input-group"><label>Confirm Password</label><input type="password" id="confirmPwd"></div><button
+                class="btn-confirm" onclick="updatePassword()">Update Password</button>
+        </div>
+    </div>
+
+    <div id="adminLoginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Administrator Access</h2><button class="modal-close"
+                    onclick="closeModal('adminLoginModal')">&times;</button>
+            </div>
+            <div class="input-group"><label>Username</label><input type="text" id="adminUser"></div>
+            <div class="input-group"><label>Password</label><input type="password" id="adminPass"></div><button
+                class="btn-confirm" onclick="verifyAdminLogin()">Authenticate</button>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome !!</h2><button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <div class="input-group"><label>Phone Number</label><input type="tel" id="loginPhone" maxlength="10"></div>
+            <div class="input-group"><label>Password</label><input type="password" id="loginPassword"></div><button
+                class="btn-confirm" onclick="userLogin()">Login</button>
+            <p style="text-align:center; margin-top:1rem; font-size:0.7rem;">New user? <a
+                    onclick="closeModal('loginModal'); showRegisterModal();"
+                    style="color:var(--primary); cursor:pointer;">Create Account</a></p>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Account</h2><button class="modal-close"
+                    onclick="closeModal('registerModal')">&times;</button>
+            </div>
+            <div class="input-group"><label>Full Name</label><input type="text" id="regName"></div>
+            <div class="input-group"><label>Phone Number</label><input type="tel" id="regPhone" maxlength="10"></div>
+            <div class="input-group"><label>Password</label><input type="password" id="regPassword"></div>
+            <div class="input-group"><label>Confirm Password</label><input type="password" id="regConfirm"></div><button
+                class="btn-confirm" onclick="userRegister()">Register</button>
+        </div>
+    </div>
+
+    <div id="seatModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2><button class="modal-close" onclick="closeModal('seatModal')">&times;</button>
+            </div>
+            <div id="modalInfo" style="font-size:0.7rem; color:var(--text-muted); margin-bottom:0.5rem;"></div>
+            <div id="hiaceView"></div>
+            <div id="bookingForm" style="display:none;">
+                <div
+                    style="background:rgba(200,165,91,0.08); border:1px solid var(--border); border-radius:14px; padding:0.8rem; margin-bottom:1rem; font-size:0.72rem;">
+                    <strong style="color:var(--primary);">Selected: Seat <span id="selectedSeatDisplay"></span></strong>
+                    <div id="discountInfo" style="color:var(--success); font-size:0.65rem; margin-top:0.2rem;"></div>
+                </div>
+                <div class="input-group"><label>Full Name</label><input type="text" id="bookName"></div>
+                <div class="input-group"><label>Phone Number *</label><input type="tel" id="bookPhone" maxlength="10">
+                </div>
+                <div id="bookPhoneError" class="error-message" style="display:none;"></div>
+                <div class="input-group"><label>Alternative Number</label><input type="tel" id="bookAltPhone"
+                        maxlength="10"></div>
+                <div class="payment-options">
+                    <div class="payment-btn" onclick="selectPayment('esewa',event)">eSewa</div>
+                    <div class="payment-btn" onclick="selectPayment('khalti',event)">Khalti</div>
+                    <div class="payment-btn" onclick="selectPayment('bank',event)">Bank</div>
+                    <div class="payment-btn cash-option selected" onclick="selectPayment('cash',event)">Cash</div>
+                </div><button class="btn-confirm" onclick="submitBookingReq()">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="paymentModalTitle">Complete Payment</h2>
+                <button class="modal-close" onclick="closePaymentModal()">&times;</button>
+            </div>
+            <div id="paymentModalContent">
+                <div class="payment-modal-icon" id="paymentIcon"><i class="fas fa-qrcode"></i></div>
+                <div class="payment-instruction" id="paymentInstruction">Enter your account details to complete payment:
+                </div>
+                <div id="paymentFormContainer" class="payment-form-fields"></div>
+                <div class="payment-details-card">
+                    <div class="detail-row"><span>💺 Seat:</span><span id="paySeatNo">-</span></div>
+                    <div class="detail-row"><span>🚐 Vehicle:</span><span id="payVehicleName">-</span></div>
+                    <div class="detail-row"><span>📅 Date:</span><span id="payTravelDate">-</span></div>
+                    <div class="detail-row"><span>💰 Amount:</span><span
+                            style="color:var(--primary); font-weight:800;">NPR <span id="paymentAmount">0</span></span>
+                    </div>
+                </div>
+                <button class="btn-confirm" onclick="submitPaymentDetails()"><i class="fas fa-check-circle"></i> Pay
+                    Now</button>
+                <div class="thankyou-message" id="thankyouMessage" style="display:none;">
+                    <i class="fas fa-smile-wink"></i> Thank you for choosing HiAce Express! We look forward to serving
+                    you again❤️.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="supportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Support</h2><button class="modal-close" onclick="closeModal('supportModal')">&times;</button>
+            </div>
+            <div id="supportContent" style="text-align:center;"></div>
+        </div>
+    </div>
+
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cancel Booking</h2><button class="modal-close" onclick="closeModal('cancelModal')">&times;</button>
+            </div>
+            <div class="cancel-detail">
+                <p><strong>Seat:</strong> <span id="cancelSeat"></span></p>
+                <p><strong>Vehicle:</strong> <span id="cancelVehicle"></span></p>
+                <p><strong>Date:</strong> <span id="cancelDate"></span></p>
+                <p><strong>Total Amount:</strong> NPR <span id="cancelAmount"></span></p>
+                <hr>
+                <p id="penaltyInfo" style="color:var(--warning); font-size:0.72rem;"></p>
+                <p><strong>Refund Amount:</strong> NPR <span id="refundAmount"></span></p>
+            </div><button class="btn-confirm" style="background:var(--danger);" onclick="confirmCancellation()">Confirm
+                Cancellation</button><button class="btn-select" onclick="closeModal('cancelModal')"
+                style="width:100%; margin-top:0.5rem;">Go Back</button>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL - change this to your server URL
+        const API_BASE_URL = window.location.origin + '/hiace-express/';
+
+        // Override localStorage functions to use PHP API
+        async function fetchFromAPI(endpoint, data = null, method = 'POST') {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(API_BASE_URL + endpoint, options);
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                return { success: false, message: 'Network error' };
+            }
+        }
+
+        // Modified userLogin function
+        async function userLogin() {
+            let phone = document.getElementById('loginPhone').value;
+            const pwd = document.getElementById('loginPassword').value;
+            if (!validateNepalPhoneNumber(phone)) {
+                showToast('Please enter valid 10-digit Nepal phone number');
+                return;
+            }
+            phone = formatPhoneNumberForStorage(phone);
+
+            const result = await fetchFromAPI('api/login.php', { phone, password: pwd });
+            if (result.success) {
+                localStorage.setItem('appUser', JSON.stringify(result.user));
+                currentUser = result.user;
+                closeModal('loginModal');
+                showToast(`Welcome ${result.user.name}!`);
+
+                // Load bookings from server
+                await loadUserBookings();
+                renderBookingTab();
+            } else {
+                showToast(result.message || 'Invalid credentials');
+            }
+        }
+
+        // Modified userRegister function
+        async function userRegister() {
+            const name = document.getElementById('regName').value;
+            let phone = document.getElementById('regPhone').value;
+            const pwd = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            if (!name || !phone || !pwd) { showToast('Fill all fields'); return; }
+            if (!validateNepalPhoneNumber(phone)) { showToast('Phone must be 10 digits starting with 98,97,96'); return; }
+            phone = formatPhoneNumberForStorage(phone);
+            if (pwd !== confirm) { showToast('Passwords do not match'); return; }
+
+            const result = await fetchFromAPI('api/register.php', { name, phone, password: pwd });
+            if (result.success) {
+                closeModal('registerModal');
+                showToast('Registration successful! Please login.');
+                showLoginModal();
+            } else {
+                showToast(result.message);
+            }
+        }
+
+        // Load vehicles from server
+        async function loadVehicles() {
+            const result = await fetchFromAPI('api/getVehicles.php', null, 'GET');
+            if (result.success) {
+                return result.vehicles;
+            }
+            return [];
+        }
+
+        // Load user bookings
+        async function loadUserBookings() {
+            if (!currentUser) return;
+            const result = await fetchFromAPI('api/getBookings.php?user_id=' + currentUser.id + '&status=confirmed', null, 'GET');
+            if (result.success) {
+                bookings = result.bookings;
+                localStorage.setItem('appBookings', JSON.stringify(bookings));
+            }
+
+            const pendingResult = await fetchFromAPI('api/getBookings.php?user_id=' + currentUser.id + '&status=pending', null, 'GET');
+            if (pendingResult.success) {
+                pending = pendingResult.bookings;
+                localStorage.setItem('appPending', JSON.stringify(pending));
+            }
+        }
+
+        // Modified submitBookingReq function
+        async function submitBookingReq() {
+            if (!currentUser) { showToast('Please login'); closeModal('seatModal'); return; }
+            if (!selectedSeat) { showToast('Select a seat first'); return; }
+            const name = document.getElementById('bookName').value;
+            let phone = document.getElementById('bookPhone').value;
+            const altPhone = document.getElementById('bookAltPhone').value;
+
+            if (!name || !phone) { showToast('Fill name and phone'); return; }
+
+            if (!validateNepalPhoneNumber(phone)) {
+                const errorEl = document.getElementById('bookPhoneError');
+                errorEl.textContent = 'Please enter a valid 10-digit Nepal phone number (starts with 98, 97, or 96)';
+                errorEl.style.display = 'block';
+                document.getElementById('bookPhone').classList.add('error');
+                return;
+            }
+            document.getElementById('bookPhoneError').style.display = 'none';
+            document.getElementById('bookPhone').classList.remove('error');
+
+            if (altPhone && !validateNepalPhoneNumber(altPhone)) {
+                showToast('Alternative phone number is invalid (must be 10 digits, starts with 98/97/96)');
+                return;
+            }
+
+            phone = formatPhoneNumberForStorage(phone);
+            const formattedAltPhone = altPhone ? formatPhoneNumberForStorage(altPhone) : '';
+
+            const pts = getUserPoints(currentUser.id);
+            const finalPrice = calcFinalPrice(selectedVehicle.price, pts);
+
+            const result = await fetchFromAPI('api/createBooking.php', {
+                user_id: currentUser.id,
+                user_name: name,
+                user_phone: phone,
+                alt_phone: formattedAltPhone,
+                vehicle_id: selectedVehicle.id,
+                seat_number: selectedSeat,
+                travel_date: currentDate,
+                price: finalPrice,
+                payment_method: selectedPayment
+            });
+
+            if (result.success) {
+                if (result.status === 'confirmed') {
+                    addPoints(currentUser.id, 5);
+                    showToast(`✅ Booking confirmed! Seat ${selectedSeat} on ${selectedVehicle.name}`);
+                } else {
+                    showToast(`✅ Booking request sent! Seat ${selectedSeat} pending approval for ${currentDate}`);
+                }
+                closeModal('seatModal');
+                selectedSeat = null;
+                await loadUserBookings();
+                renderBookingTab();
+            } else {
+                showToast(result.message || 'Booking failed');
+            }
+        }
+        const vehicles = [
+            { id: 1, name: "Morning Express", registration: "Ba 1 Kha 1234", departure: "6:00 AM", driver: "Rajesh Thapa", driverPhone: "9812345671", seats: 13, price: 800 },
+            { id: 2, name: "Sunrise Express", registration: "Ba 1 Kha 5678", departure: "7:00 AM", driver: "Suresh KC", driverPhone: "9812345672", seats: 13, price: 800 },
+            { id: 3, name: "Day Express", registration: "Ba 1 Kha 9012", departure: "8:00 AM", driver: "Hari Bahadur", driverPhone: "9812345673", seats: 13, price: 800 },
+            { id: 4, name: "Mid-Day Express", registration: "Ba 1 Kha 3456", departure: "10:00 AM", driver: "Gopal Shrestha", driverPhone: "9812345674", seats: 13, price: 800 },
+            { id: 5, name: "Royal Express", registration: "Ba 1 Kha 7890", departure: "12:00 PM", driver: "Krishna Poudel", driverPhone: "9812345675", seats: 13, price: 800 },
+            { id: 6, name: "Afternoon Express", registration: "Ba 1 Kha 2345", departure: "2:00 PM", driver: "Bikram Gurung", driverPhone: "9812345676", seats: 13, price: 800 },
+            { id: 7, name: "Evening Express", registration: "Ba 1 Kha 6789", departure: "4:00 PM", driver: "Dipak Rai", driverPhone: "9812345677", seats: 13, price: 800 },
+            { id: 8, name: "Night Express", registration: "Ba 1 Kha 0123", departure: "6:00 PM", driver: "Manoj Tamang", driverPhone: "9812345678", seats: 13, price: 800 },
+            { id: 9, name: "Late Night Express", registration: "Ba 1 Kha 4567", departure: "8:00 PM", driver: "Santosh Magar", driverPhone: "9812345679", seats: 13, price: 800 }
+        ];
+
+        let currentUser = JSON.parse(localStorage.getItem('appUser')) || null;
+        let bookings = JSON.parse(localStorage.getItem('appBookings')) || [];
+        let pending = JSON.parse(localStorage.getItem('appPending')) || [];
+        let users = JSON.parse(localStorage.getItem('appUsers')) || [];
+        let userPoints = JSON.parse(localStorage.getItem('userPoints')) || {};
+        let currentTab = 'booking';
+        let currentDate = new Date().toISOString().split('T')[0];
+        let selectedVehicle = null;
+        let selectedSeat = null;
+        let selectedPayment = 'cash';
+        let pendingBookingReq = null;
+        let cancelBookingId = null;
+        let cancelBookingData = null;
+
+        function calculateCommission(amount) { return Math.round(amount * 0.10); }
+        function calculateOwnerEarning(amount) { return amount - calculateCommission(amount); }
+
+        function validateNepalPhoneNumber(phone) {
+            if (!phone) return false;
+            const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+            const phoneRegex = /^(98|97|96)[0-9]{8}$/;
+            return phoneRegex.test(cleaned);
+        }
+
+        function formatPhoneNumberForStorage(phone) {
+            return phone.replace(/[\s\-\(\)]/g, '');
+        }
+
+        function isVehicleDeparted(vehicle, travelDate) {
+            const today = new Date().toISOString().split('T')[0];
+            if (travelDate > today) return false;
+            if (travelDate < today) return true;
+            const now = new Date();
+            const [time, ampm] = vehicle.departure.split(' ');
+            let [h, m] = time.split(':').map(Number);
+            if (ampm === 'PM' && h !== 12) h += 12;
+            if (ampm === 'AM' && h === 12) h = 0;
+            const departureDateTime = new Date();
+            departureDateTime.setHours(h, m, 0, 0);
+            return now > departureDateTime;
+        }
+
+        function getDepartureDateTime(vehicle, travelDate) {
+            const [time, ampm] = vehicle.departure.split(' ');
+            let [h, m] = time.split(':').map(Number);
+            if (ampm === 'PM' && h !== 12) h += 12;
+            if (ampm === 'AM' && h === 12) h = 0;
+            const dt = new Date(travelDate);
+            dt.setHours(h, m, 0, 0);
+            return dt;
+        }
+
+        function showToast(msg) { const t = document.getElementById('toast'); t.innerHTML = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3500); }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function updateClock() { const now = new Date(); const h = now.getHours(); const m = now.getMinutes().toString().padStart(2, '0'); const ap = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; document.getElementById('realTimeClock').innerHTML = `${h12}:${m} ${ap}`; }
+        setInterval(updateClock, 1000); updateClock();
+
+        function getUserPoints(userId) { return userPoints[userId] || 0; }
+        function addPoints(userId, pts) { userPoints[userId] = (userPoints[userId] || 0) + pts; localStorage.setItem('userPoints', JSON.stringify(userPoints)); }
+        function getDiscount(points) { if (points >= 500) return { pct: 10, label: 'Gold Member – 10% off!' }; if (points >= 200) return { pct: 5, label: 'Silver Member – 5% off!' }; if (points >= 50) return { pct: 2, label: 'Bronze Member – 2% off!' }; return { pct: 0, label: '' }; }
+        function calcFinalPrice(basePrice, points) { const d = getDiscount(points); return Math.round(basePrice * (1 - d.pct / 100)); }
+
+        function getStatus(vId, date, seat) {
+            const isBooked = bookings.some(b => b.vehicleId === vId && b.travelDate === date && b.seatNumber == seat && b.status === 'confirmed');
+            if (isBooked) return 'booked';
+            const isPending = pending.some(p => p.vehicleId === vId && p.travelDate === date && p.seatNumber == seat);
+            if (isPending) return 'pending';
+            return 'available';
+        }
+
+        function buildSeat(num, status, interactive) {
+            let clickFn = '';
+            if (interactive && status === 'available') clickFn = `onclick="selectSeat('${num}')"`;
+            let statusText = status === 'available' ? 'FREE' : (status === 'pending' ? 'HOLD' : 'TAKEN');
+            let seatClass = status;
+            return `<div class="seat-3d ${seatClass}" ${clickFn}><div class="seat-num">${num}</div><div class="seat-lbl">${statusText}</div></div>`;
+        }
+
+        function buildHiaceView(vehicleId, travelDate, interactive) {
+            let html = `<div class="hiace-wrapper"><div class="hiace-legend"><div class="legend-item"><div class="legend-dot available"></div>Available</div><div class="legend-item"><div class="legend-dot pending"></div>Pending</div><div class="legend-item"><div class="legend-dot booked"></div>Booked</div>${interactive ? '<div class="legend-item"><div class="legend-dot" style="background:var(--primary);"></div>Selected</div>' : ''}</div><div class="hiace-body">`;
+
+            html += `<div class="hiace-front"><div class="windshield">🚐 WINDSHIELD</div></div>`;
+
+            html += `<div class="seat-row">`;
+            html += `<div class="seat-3d ${getStatus(vehicleId, travelDate, 'A')}" ${interactive && getStatus(vehicleId, travelDate, 'A') === 'available' ? `onclick="selectSeat('A')"` : ''}><div class="seat-num">A</div><div class="seat-lbl">${getStatus(vehicleId, travelDate, 'A') === 'available' ? 'FREE' : (getStatus(vehicleId, travelDate, 'A') === 'pending' ? 'HOLD' : 'TAKEN')}</div></div>`;
+            html += `<div class="seat-3d ${getStatus(vehicleId, travelDate, 'B')}" ${interactive && getStatus(vehicleId, travelDate, 'B') === 'available' ? `onclick="selectSeat('B')"` : ''}><div class="seat-num">B</div><div class="seat-lbl">${getStatus(vehicleId, travelDate, 'B') === 'available' ? 'FREE' : (getStatus(vehicleId, travelDate, 'B') === 'pending' ? 'HOLD' : 'TAKEN')}</div></div>`;
+            html += `<div class="driver-area"><i class="fas fa-steering-wheel"></i> <span>DRIVER</span></div>`;
+            html += `</div>`;
+
+            html += `<div class="seat-row">`;
+            for (let i = 1; i <= 3; i++) {
+                html += buildSeat(i, getStatus(vehicleId, travelDate, i), interactive);
+            }
+            html += `</div>`;
+
+            html += `<div class="seat-row">`;
+            for (let i = 4; i <= 6; i++) {
+                html += buildSeat(i, getStatus(vehicleId, travelDate, i), interactive);
+            }
+            html += `</div>`;
+
+            html += `<div class="seat-row">`;
+            for (let i = 7; i <= 9; i++) {
+                html += buildSeat(i, getStatus(vehicleId, travelDate, i), interactive);
+            }
+            html += `</div>`;
+
+            html += `<div class="seat-row">`;
+            for (let i = 10; i <= 13; i++) {
+                html += buildSeat(i, getStatus(vehicleId, travelDate, i), interactive);
+            }
+            html += `</div>`;
+
+            html += `</div></div>`;
+            return html;
+        }
+
+        function getDates() { let d = []; for (let i = 0; i <= 7; i++) { let dt = new Date(); dt.setDate(dt.getDate() + i); d.push({ value: dt.toISOString().split('T')[0], day: dt.toLocaleDateString('en', { weekday: 'short' }), date: dt.getDate() }); } return d; }
+
+        function startApp() { document.getElementById('welcomeScreen').classList.add('hidden'); document.getElementById('appContainer').classList.add('show'); if (currentUser) { renderBookingTab(); } else { setTimeout(() => showLoginModal(), 100); document.getElementById('mainContent').innerHTML = '<div style="text-align:center; padding:3rem;"><i class="fas fa-lock" style="font-size:3rem; color:var(--primary); margin-bottom:1rem; display:block;"></i><p style="color:var(--text-muted);">Please login to continue</p></div>'; } }
+
+        function renderBookingTab() {
+            if (!currentUser) { showLoginModal(); return; }
+            const dates = getDates(); const pts = getUserPoints(currentUser.id);
+            let html = `<div class="points-badge"><span>⭐ Loyalty Points</span><span class="points-value">${pts}</span></div><div class="date-scroll"><div class="date-items">`;
+            dates.forEach(d => { html += `<div class="date-item ${currentDate === d.value ? 'active' : ''}" onclick="setDate('${d.value}')"><div class="date-day">${d.day}</div><div class="date-num">${d.date}</div></div>`; });
+            html += `</div></div>`;
+            vehicles.forEach(v => {
+                const departed = isVehicleDeparted(v, currentDate);
+                const confirmed = bookings.filter(b => b.vehicleId === v.id && b.travelDate === currentDate && b.status === 'confirmed').length;
+                const pendingCount = pending.filter(p => p.vehicleId === v.id && p.travelDate === currentDate).length;
+                const available = v.seats - confirmed - pendingCount;
+                const finalPrice = calcFinalPrice(v.price, pts);
+                const departedClass = departed ? 'departed' : '';
+                const departedBadge = departed ? `<span class="departed-badge"><i class="fas fa-clock"></i> Departed</span>` : `<span><i class="fas fa-clock"></i> ${v.departure}</span>`;
+                const selectButton = departed ? `<button class="btn-select" disabled style="background:var(--dark-gray); color:var(--text-muted);"><i class="fas fa-ban"></i> Not Available</button>` : `<button class="btn-select" onclick="openSeatModal(${v.id})">Select Seat</button>`;
+
+                html += `<div class="vehicle-card ${departedClass}"><div class="vehicle-time"><h3>${v.name}</h3>${departedBadge}</div><div class="vehicle-details"><div class="vehicle-info-row"><span><i class="fas fa-id-card"></i> ${v.registration}</span><span class="vehicle-price">NPR ${finalPrice}</span></div><div class="vehicle-info-row"><span><i class="fas fa-chair"></i> ${available} available</span><span><i class="fas fa-user"></i> ${v.driver}</span></div>${buildHiaceView(v.id, currentDate, false)}${selectButton}</div></div>`;
+            });
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        function setDate(d) { currentDate = d; renderBookingTab(); }
+
+        function openSeatModal(vId) {
+            if (!currentUser) { showToast('Please login first'); showLoginModal(); return; }
+            const v = vehicles.find(v => v.id === vId);
+            if (isVehicleDeparted(v, currentDate)) {
+                showToast(`⚠️ ${v.name} has already departed for today!`);
+                return;
+            }
+            selectedVehicle = v;
+            selectedSeat = null;
+            document.getElementById('modalTitle').innerHTML = `${selectedVehicle.name}`;
+            document.getElementById('modalInfo').innerHTML = `<i class="fas fa-calendar"></i> ${new Date(currentDate).toLocaleDateString()} &nbsp;|&nbsp; <i class="fas fa-clock"></i> ${selectedVehicle.departure}`;
+            document.getElementById('hiaceView').innerHTML = buildHiaceView(vId, currentDate, true);
+            document.getElementById('bookingForm').style.display = 'none';
+            document.getElementById('seatModal').style.display = 'flex';
+        }
+
+        function selectSeat(seat) {
+            selectedSeat = seat;
+            document.getElementById('selectedSeatDisplay').textContent = seat;
+            document.getElementById('bookName').value = currentUser?.name || '';
+            document.getElementById('bookPhone').value = currentUser?.phone || '';
+            document.getElementById('bookAltPhone').value = '';
+            document.getElementById('bookPhoneError').style.display = 'none';
+            const pts = getUserPoints(currentUser.id);
+            const finalPrice = calcFinalPrice(selectedVehicle.price, pts);
+            document.getElementById('discountInfo').innerHTML = pts >= 50 ? `⭐ ${getDiscount(pts).label} — Final: NPR ${finalPrice}` : '';
+            document.getElementById('bookingForm').style.display = 'block';
+        }
+
+        function selectPayment(method, e) {
+            selectedPayment = method;
+            document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('selected'));
+            if (e && e.target) e.target.classList.add('selected');
+        }
+
+        function submitBookingReq() {
+            if (!currentUser) { showToast('Please login'); closeModal('seatModal'); return; }
+            if (!selectedSeat) { showToast('Select a seat first'); return; }
+            const name = document.getElementById('bookName').value;
+            let phone = document.getElementById('bookPhone').value;
+            const altPhone = document.getElementById('bookAltPhone').value;
+
+            if (!name || !phone) { showToast('Fill name and phone'); return; }
+
+            if (!validateNepalPhoneNumber(phone)) {
+                const errorEl = document.getElementById('bookPhoneError');
+                errorEl.textContent = 'Please enter a valid 10-digit Nepal phone number (starts with 98, 97, or 96)';
+                errorEl.style.display = 'block';
+                document.getElementById('bookPhone').classList.add('error');
+                return;
+            }
+            document.getElementById('bookPhoneError').style.display = 'none';
+            document.getElementById('bookPhone').classList.remove('error');
+
+            if (altPhone && !validateNepalPhoneNumber(altPhone)) {
+                showToast('Alternative phone number is invalid (must be 10 digits, starts with 98/97/96)');
+                return;
+            }
+
+            phone = formatPhoneNumberForStorage(phone);
+            const formattedAltPhone = altPhone ? formatPhoneNumberForStorage(altPhone) : '';
+
+            const pts = getUserPoints(currentUser.id);
+            const finalPrice = calcFinalPrice(selectedVehicle.price, pts);
+
+            const today = new Date().toISOString().split('T')[0];
+            const isToday = currentDate === today;
+
+            if (isToday) {
+                const confirmedBooking = {
+                    id: Date.now(),
+                    userId: currentUser.id,
+                    userName: name,
+                    userPhone: phone,
+                    altPhone: formattedAltPhone,
+                    vehicleId: selectedVehicle.id,
+                    vehicleName: selectedVehicle.name,
+                    registration: selectedVehicle.registration,
+                    departure: selectedVehicle.departure,
+                    seatNumber: selectedSeat,
+                    travelDate: currentDate,
+                    price: finalPrice,
+                    originalPrice: selectedVehicle.price,
+                    status: 'confirmed',
+                    paymentMethod: selectedPayment,
+                    commission: calculateCommission(finalPrice),
+                    ownerEarning: calculateOwnerEarning(finalPrice),
+                    requestedAt: new Date().toISOString(),
+                    confirmedAt: new Date().toISOString(),
+                    bookedByUser: true
+                };
+                bookings.push(confirmedBooking);
+                localStorage.setItem('appBookings', JSON.stringify(bookings));
+                addPoints(currentUser.id, 5);
+                showToast(`✅ Booking confirmed! Seat ${selectedSeat} on ${selectedVehicle.name}`);
+                closeModal('seatModal');
+                selectedSeat = null;
+                renderBookingTab();
+            } else {
+                const req = { id: Date.now(), userId: currentUser.id, userName: name, userPhone: phone, altPhone: formattedAltPhone, vehicleId: selectedVehicle.id, vehicleName: selectedVehicle.name, registration: selectedVehicle.registration, departure: selectedVehicle.departure, seatNumber: selectedSeat, travelDate: currentDate, price: finalPrice, originalPrice: selectedVehicle.price, status: 'pending', paymentMethod: selectedPayment, requestedAt: new Date().toISOString() };
+                pending.push(req);
+                localStorage.setItem('appPending', JSON.stringify(pending));
+                showToast(`✅ Booking request sent! Seat ${selectedSeat} pending approval for ${currentDate}`);
+                closeModal('seatModal');
+                selectedSeat = null;
+                renderBookingTab();
+            }
+        }
+
+        function showPaymentModal(method, amount) {
+            const modal = document.getElementById('paymentModal');
+            const title = document.getElementById('paymentModalTitle');
+            const icon = document.getElementById('paymentIcon');
+            const instruction = document.getElementById('paymentInstruction');
+            const amountSpan = document.getElementById('paymentAmount');
+            const formContainer = document.getElementById('paymentFormContainer');
+
+            amountSpan.textContent = amount;
+            document.getElementById('paySeatNo').textContent = selectedSeat;
+            document.getElementById('payVehicleName').textContent = `${selectedVehicle.name} (${selectedVehicle.departure})`;
+            document.getElementById('payTravelDate').textContent = new Date(currentDate).toLocaleDateString();
+
+            let formHtml = '';
+            if (method === 'esewa') {
+                title.innerHTML = '<i class="fas fa-mobile-alt"></i> eSewa Payment';
+                icon.innerHTML = '<i class="fas fa-mobile-alt" style="color:#4CAF50;"></i>';
+                instruction.innerHTML = 'Enter your eSewa account details:';
+                formHtml = `
+            <div class="input-group"><label>📱 eSewa Phone Number</label><input type="tel" id="esewaPhone" maxlength="10" placeholder="98XXXXXXXX" required></div>
+            <div class="input-group"><label>🔐 eSewa MPIN</label><input type="password" id="esewaMpin" placeholder="Enter 4-digit MPIN" maxlength="4" required></div>
+        `;
+            } else if (method === 'khalti') {
+                title.innerHTML = '<i class="fas fa-mobile-alt"></i> Khalti Payment';
+                icon.innerHTML = '<i class="fas fa-mobile-alt" style="color:#5C2D91;"></i>';
+                instruction.innerHTML = 'Enter your Khalti account details:';
+                formHtml = `
+            <div class="input-group"><label>📱 Khalti Phone Number</label><input type="tel" id="khaltiPhone" maxlength="10" placeholder="98XXXXXXXX" required></div>
+            <div class="input-group"><label>🔐 Khalti MPIN</label><input type="password" id="khaltiMpin" placeholder="Enter 4-digit MPIN" maxlength="4" required></div>
+        `;
+            } else if (method === 'bank') {
+                title.innerHTML = '<i class="fas fa-university"></i> Bank Transfer';
+                icon.innerHTML = '<i class="fas fa-university" style="color:var(--primary);"></i>';
+                instruction.innerHTML = 'Enter your bank account details:';
+                formHtml = `
+            <div class="input-group"><label>🏦 Bank Name</label><input type="text" id="bankName" placeholder="e.g., NIC Asia, NMB, etc." required></div>
+            <div class="input-group"><label>🔢 Account Number</label><input type="text" id="bankAccount" placeholder="Enter your account number" required></div>
+            <div class="input-group"><label>👤 Account Holder Name</label><input type="text" id="bankHolderName" placeholder="As per bank account" required></div>
+        `;
+            }
+
+            formContainer.innerHTML = formHtml;
+            modal.style.display = 'flex';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            pendingBookingReq = null;
+        }
+
+        function submitPaymentDetails() {
+            if (!pendingBookingReq) return;
+
+            const method = selectedPayment;
+            let isValid = true;
+            let paymentDetails = {};
+
+            if (method === 'esewa') {
+                let phone = document.getElementById('esewaPhone')?.value.trim();
+                const mpin = document.getElementById('esewaMpin')?.value.trim();
+                if (!phone || !validateNepalPhoneNumber(phone)) { showToast('Please enter valid 10-digit eSewa phone number'); isValid = false; }
+                else if (!mpin || mpin.length !== 4) { showToast('Please enter 4-digit eSewa MPIN'); isValid = false; }
+                else { phone = formatPhoneNumberForStorage(phone); paymentDetails = { phone, mpin }; }
+            } else if (method === 'khalti') {
+                let phone = document.getElementById('khaltiPhone')?.value.trim();
+                const mpin = document.getElementById('khaltiMpin')?.value.trim();
+                if (!phone || !validateNepalPhoneNumber(phone)) { showToast('Please enter valid 10-digit Khalti phone number'); isValid = false; }
+                else if (!mpin || mpin.length !== 4) { showToast('Please enter 4-digit Khalti MPIN'); isValid = false; }
+                else { phone = formatPhoneNumberForStorage(phone); paymentDetails = { phone, mpin }; }
+            } else if (method === 'bank') {
+                const bankName = document.getElementById('bankName')?.value.trim();
+                const accountNo = document.getElementById('bankAccount')?.value.trim();
+                const holderName = document.getElementById('bankHolderName')?.value.trim();
+                if (!bankName) { showToast('Please enter bank name'); isValid = false; }
+                else if (!accountNo) { showToast('Please enter account number'); isValid = false; }
+                else if (!holderName) { showToast('Please enter account holder name'); isValid = false; }
+                else { paymentDetails = { bankName, accountNo, holderName }; }
+            }
+
+            if (!isValid) return;
+
+            const { name, phone, altPhone, finalPrice } = pendingBookingReq;
+
+            const req = { id: Date.now(), userId: currentUser.id, userName: name, userPhone: phone, altPhone, vehicleId: selectedVehicle.id, vehicleName: selectedVehicle.name, registration: selectedVehicle.registration, departure: selectedVehicle.departure, seatNumber: selectedSeat, travelDate: currentDate, price: finalPrice, originalPrice: selectedVehicle.price, status: 'pending', paymentMethod: selectedPayment, paymentDetails: paymentDetails, requestedAt: new Date().toISOString() };
+            pending.push(req);
+            localStorage.setItem('appPending', JSON.stringify(pending));
+
+            const thankyouMsg = document.getElementById('thankyouMessage');
+            thankyouMsg.style.display = 'block';
+            setTimeout(() => { thankyouMsg.style.display = 'none'; }, 3000);
+
+            showToast(`✅ Booking request sent! Seat ${selectedSeat} pending approval`);
+            closePaymentModal();
+            closeModal('seatModal');
+            selectedSeat = null;
+            pendingBookingReq = null;
+            renderBookingTab();
+        }
+
+        function renderMyBookings() {
+            if (!currentUser) { showLoginModal(); return; }
+            const userBookings = [...bookings.filter(b => b.userId === currentUser.id), ...pending.filter(p => p.userId === currentUser.id)];
+            if (userBookings.length === 0) { document.getElementById('mainContent').innerHTML = `<div style="text-align:center; padding:3rem;"><i class="fas fa-ticket-alt" style="font-size:3rem; color:var(--text-muted);"></i><p>No bookings yet</p><button class="btn-select" style="max-width:200px; margin:1rem auto;" onclick="switchTab('booking',null)">Book Now</button></div>`; return; }
+            let html = '';
+            userBookings.forEach(b => {
+                const isConfirmed = b.status === 'confirmed';
+                const vehicle = vehicles.find(v => v.id === b.vehicleId);
+                const isDeparted = vehicle ? isVehicleDeparted(vehicle, b.travelDate) : false;
+                html += `<div class="ticket-card"><div class="ticket-header"><div><strong>Seat ${b.seatNumber}</strong><br><span style="font-size:0.6rem;">${b.departure} | ${new Date(b.travelDate).toLocaleDateString()}</span></div><div class="ticket-seat-badge">${b.seatNumber}</div></div><div class="ticket-body"><div class="ticket-row"><span class="ticket-label">Passenger</span><span class="ticket-value">${b.userName}</span></div><div class="ticket-row"><span class="ticket-label">Phone</span><span class="ticket-value">${b.userPhone}</span></div><div class="ticket-row"><span class="ticket-label">Vehicle</span><span class="ticket-value">${vehicle?.name}</span></div><div class="ticket-row"><span class="ticket-label">Reg. Number</span><span class="ticket-value">${vehicle?.registration}</span></div><div class="ticket-row"><span class="ticket-label">Driver</span><span class="ticket-value">${vehicle?.driver} (${vehicle?.driverPhone})</span></div><div class="ticket-row"><span class="ticket-label">Departure</span><span class="ticket-value">${b.departure}</span></div><div class="ticket-row"><span class="ticket-label">Fare</span><span class="ticket-value">NPR ${b.price}</span></div><div class="ticket-row"><span class="ticket-label">Payment</span><span class="ticket-value">${b.paymentMethod === 'cash' ? 'Cash' : b.paymentMethod.toUpperCase()}</span></div><div class="ticket-row"><span class="ticket-label">Status</span><span class="ticket-value" style="color:${isConfirmed ? '#10b981' : '#f59e0b'};">${isConfirmed ? 'CONFIRMED' : 'PENDING'}</span></div></div><div class="ticket-actions">${isConfirmed && !isDeparted ? `<button class="btn-print btn-download" onclick="downloadTicket(${b.id})">📄 Download PDF Ticket</button>` : ''}${!isDeparted ? `<button class="btn-print btn-cancel" onclick="userCancelBooking(${b.id})">Cancel</button>` : '<button class="btn-print btn-cancel" disabled style="opacity:0.5; cursor:not-allowed;">Cannot Cancel (Departed)</button>'}</div><div style="background:rgba(200,165,91,0.08); padding:0.5rem; text-align:center; font-size:0.6rem; color:var(--primary);"><i class="fas fa-heart"></i> Thank you for traveling with HiAce Express! See you again.</div></div>`;
+            });
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        function downloadTicket(bookingId) {
+            const all = [...bookings, ...pending];
+            const b = all.find(x => x.id === bookingId);
+            if (!b) return;
+            const vehicle = vehicles.find(v => v.id === b.vehicleId);
+
+            const ticketHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>HiAce Express Ticket - Seat ${b.seatNumber}</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body {
+                        font-family: 'Segoe UI', Arial, sans-serif;
+                        background: #fff;
+                        padding: 20px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                    }
+                    .ticket {
+                        max-width: 450px;
+                        width: 100%;
+                        background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+                        border-radius: 20px;
+                        overflow: hidden;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+                        border: 1px solid #e0e0e0;
+                    }
+                    .ticket-header {
+                        background: linear-gradient(135deg, #c8a55b, #b8923a);
+                        padding: 20px;
+                        text-align: center;
+                        color: #000;
+                    }
+                    .ticket-header h2 { font-size: 24px; margin-bottom: 5px; letter-spacing: 1px; }
+                    .ticket-header p { font-size: 12px; opacity: 0.8; }
+                    .ticket-body { padding: 20px; }
+                    .ticket-row {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 10px 0;
+                        border-bottom: 1px dashed #ddd;
+                    }
+                    .ticket-row:last-child { border-bottom: none; }
+                    .ticket-label { font-size: 12px; color: #666; font-weight: 500; }
+                    .ticket-value { font-size: 13px; font-weight: 700; color: #222; }
+                    .seat-badge {
+                        background: #c8a55b;
+                        color: #000;
+                        padding: 5px 15px;
+                        border-radius: 30px;
+                        display: inline-block;
+                        font-weight: 800;
+                        font-size: 18px;
+                        text-align: center;
+                        margin: 10px 0;
+                    }
+                    .qr-placeholder {
+                        text-align: center;
+                        margin: 15px 0;
+                        padding: 10px;
+                        background: #f0f0f0;
+                        border-radius: 10px;
+                    }
+                    .qr-placeholder i { font-size: 60px; color: #c8a55b; }
+                    .thankyou {
+                        background: rgba(200,165,91,0.1);
+                        padding: 12px;
+                        text-align: center;
+                        border-radius: 10px;
+                        margin-top: 15px;
+                        font-size: 11px;
+                        color: #b8923a;
+                    }
+                    .footer {
+                        text-align: center;
+                        padding: 12px;
+                        font-size: 9px;
+                        color: #999;
+                        border-top: 1px solid #eee;
+                    }
+                </style>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
+            </head>
+            <body>
+                <div class="ticket" id="ticketContent">
+                    <div class="ticket-header">
+                        <h2>🚐 HiAce Express</h2>
+                        <p>Nepalgunj → Butwal</p>
+                    </div>
+                    <div class="ticket-body">
+                        <div style="text-align: center;">
+                            <div class="seat-badge">Seat ${b.seatNumber}</div>
+                        </div>
+                        <div class="ticket-row"><span class="ticket-label">Passenger Name</span><span class="ticket-value">${b.userName}</span></div>
+                        <div class="ticket-row"><span class="ticket-label">Phone Number</span><span class="ticket-value">${b.userPhone}</span></div>
+                        ${b.altPhone ? `<div class="ticket-row"><span class="ticket-label">Alternative Phone</span><span class="ticket-value">${b.altPhone}</span></div>` : ''}
+                        <div class="ticket-row"><span class="ticket-label">Vehicle</span><span class="ticket-value">${vehicle?.name} (${vehicle?.departure})</span></div>
+                        <div class="ticket-row"><span class="ticket-label">Registration Number</span><span class="ticket-value">${vehicle?.registration}</span></div>
+                        <div class="ticket-row"><span class="ticket-label">Driver Name</span><span class="ticket-value">${vehicle?.driver}</span></div>
+                        <div class="ticket-row"><span class="ticket-label">Driver Contact</span><span class="ticket-value">${vehicle?.driverPhone}</span></div>
+                        <div class="ticket-row"><span class="ticket-label">Travel Date</span><span class="ticket-value">${new Date(b.travelDate).toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+                        <div class="ticket-row"><span class="ticket-label">Departure Time</span><span class="ticket-value">${b.departure}</span></div>
+                        <div class="ticket-row"><span class="ticket-label">Fare Amount</span><span class="ticket-value" style="color:#c8a55b; font-size:16px;">NPR ${b.price}</span></div>
+                        <div class="ticket-row"><span class="ticket-label">Payment Method</span><span class="ticket-value">${b.paymentMethod === 'cash' ? '💰 Cash' : b.paymentMethod.toUpperCase()}</span></div>
+                        <div class="ticket-row"><span class="ticket-label">Booking Status</span><span class="ticket-value" style="color:#10b981;">${b.status === 'confirmed' ? 'CONFIRMED ✓' : 'PENDING'}</span></div>
+                        <div class="qr-placeholder"><i class="fas fa-qrcode"></i><p style="font-size:10px; margin-top:5px;">Scan for verification</p></div>
+                        <div class="thankyou"><i class="fas fa-smile-wink"></i> Thank you for choosing HiAce Express!<br>Have a safe journey. See you again!</div>
+                    </div>
+                    <div class="footer">This is a computer generated ticket. Please carry a valid ID proof.</div>
+                </div>
+                <script>
+                    window.onload = function() {
+                        const element = document.getElementById('ticketContent');
+                        const opt = {
+                            margin: [0.5, 0.5, 0.5, 0.5],
+                            filename: 'HiAce_Ticket_Seat_${b.seatNumber}.pdf',
+                            image: { type: 'jpeg', quality: 0.98 },
+                            html2canvas: { scale: 2, useCORS: true },
+                            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                        };
+                        html2pdf().set(opt).from(element).save();
+                    };
+                <\/script>
+            </body>
+            </html>
+            `;
+
+            const blob = new Blob([ticketHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('Generating PDF ticket...');
+        }
+
+        function userCancelBooking(bookingId) {
+            const all = [...bookings, ...pending];
+            const booking = all.find(b => b.id === bookingId);
+            if (!booking || booking.userId !== currentUser.id) { showToast('Cannot cancel this booking'); return; }
+            const vehicle = vehicles.find(v => v.id === booking.vehicleId);
+            if (vehicle && isVehicleDeparted(vehicle, booking.travelDate)) {
+                showToast('Cannot cancel a departed trip!');
+                return;
+            }
+            cancelBookingId = bookingId;
+            cancelBookingData = booking;
+            const penaltyInfo = getPenaltyInfo(booking);
+            document.getElementById('cancelSeat').innerText = booking.seatNumber;
+            document.getElementById('cancelVehicle').innerText = vehicle?.name || booking.vehicleName;
+            document.getElementById('cancelDate').innerText = new Date(booking.travelDate).toLocaleDateString();
+            document.getElementById('cancelAmount').innerText = booking.price;
+            document.getElementById('penaltyInfo').innerHTML = penaltyInfo.message;
+            document.getElementById('refundAmount').innerText = Math.round(penaltyInfo.refund);
+            document.getElementById('cancelModal').style.display = 'flex';
+        }
+
+        function getPenaltyInfo(booking) {
+            const vehicle = vehicles.find(v => v.id === booking.vehicleId);
+            const [time, ampm] = booking.departure.split(' ');
+            let [h, m] = time.split(':').map(Number);
+            if (ampm === 'PM' && h !== 12) h += 12;
+            if (ampm === 'AM' && h === 12) h = 0;
+            const depTime = new Date(booking.travelDate);
+            depTime.setHours(h, m, 0, 0);
+            const now = new Date();
+            const diffHours = (depTime - now) / (1000 * 60 * 60);
+            if (diffHours <= 0) return { penalty: booking.price, refund: 0, message: "❌ Departure passed. No refund." };
+            if (diffHours <= 1) { const penalty = Math.round(booking.price * 0.3); return { penalty, refund: booking.price - penalty, message: `⚠️ 30% penalty: NPR ${penalty} (Cancelled within 1 hour of departure)` }; }
+            if (diffHours <= 24) { const penalty = Math.round(booking.price * 0.15); return { penalty, refund: booking.price - penalty, message: `⚠️ 15% penalty: NPR ${penalty} (Cancelled within 24 hours)` }; }
+            return { penalty: 0, refund: booking.price, message: "✅ Full refund available" };
+        }
+
+        function confirmCancellation() {
+            if (!cancelBookingId) return;
+            bookings = bookings.filter(b => b.id !== cancelBookingId);
+            pending = pending.filter(p => p.id !== cancelBookingId);
+            localStorage.setItem('appBookings', JSON.stringify(bookings));
+            localStorage.setItem('appPending', JSON.stringify(pending));
+            const penaltyInfo = getPenaltyInfo(cancelBookingData);
+            closeModal('cancelModal');
+            showToast(penaltyInfo.refund > 0 ? `Cancelled! Refund: NPR ${penaltyInfo.refund}` : "Cancelled. No refund.");
+            cancelBookingId = null;
+            cancelBookingData = null;
+            renderMyBookings();
+        }
+
+        function openSupport() {
+            if (!currentUser) { showToast('Login to contact support'); showLoginModal(); return; }
+            const todayBookings = [...bookings.filter(b => b.userId === currentUser.id && b.travelDate === currentDate && b.status === 'confirmed'), ...pending.filter(p => p.userId === currentUser.id && p.travelDate === currentDate)];
+            if (todayBookings.length === 0) { showToast('No active trip today'); return; }
+            const booking = todayBookings[0];
+            const vehicle = vehicles.find(v => v.id === booking.vehicleId);
+            document.getElementById('supportContent').innerHTML = `<i class="fas fa-headset" style="font-size:3rem; color:var(--primary); margin-bottom:1rem;"></i><div style="background:var(--dark-gray); padding:1rem; border-radius:16px; text-align:left;"><strong>Your Trip Today</strong><br>${vehicle?.name} • Seat ${booking.seatNumber} • ${vehicle?.departure}<br><br><strong>Driver Contact</strong><br><i class="fas fa-user"></i> ${vehicle?.driver}<br><i class="fas fa-phone"></i> ${vehicle?.driverPhone}<br><br><a href="tel:${vehicle?.driverPhone}" style="background:var(--primary); color:var(--dark); padding:0.6rem 1rem; border-radius:40px; text-decoration:none; display:inline-block; font-weight:600;"><i class="fas fa-phone-alt"></i> Call Driver</a></div>`;
+            document.getElementById('supportModal').style.display = 'flex';
+        }
+
+        function switchTab(tab, e) {
+            if (!currentUser) { showLoginModal(); return; }
+            currentTab = tab;
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            if (e && e.target) e.target.closest('.nav-item').classList.add('active');
+            if (tab === 'booking') renderBookingTab();
+            else renderMyBookings();
+        }
+
+        function showProfile() { if (currentUser) showToast(`Welcome ${currentUser.name}`); else showLoginModal(); }
+        function showLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
+        function showRegisterModal() { document.getElementById('registerModal').style.display = 'flex'; }
+        function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
+        function showChangePassword() { closeModal('settingsModal'); document.getElementById('changePwdModal').style.display = 'flex'; }
+        function showAdminLogin() { closeModal('settingsModal'); document.getElementById('adminLoginModal').style.display = 'flex'; }
+        function verifyAdminLogin() { const u = document.getElementById('adminUser').value, p = document.getElementById('adminPass').value; if (u === '1590' && p === '9510') { closeModal('adminLoginModal'); localStorage.setItem('adminAuth', 'true'); window.location.href = 'admin.html'; } else showToast('Invalid credentials'); }
+        function updatePassword() { if (!currentUser) { showToast('Login first'); return; } const old = document.getElementById('oldPwd').value, newp = document.getElementById('newPwd').value, confirm = document.getElementById('confirmPwd').value; if (old !== currentUser.password) { showToast('Current password incorrect'); return; } if (newp !== confirm) { showToast('Passwords do not match'); return; } if (newp.length < 4) { showToast('Min 4 characters'); return; } currentUser.password = newp; localStorage.setItem('appUser', JSON.stringify(currentUser)); users = users.map(u => u.id === currentUser.id ? currentUser : u); localStorage.setItem('appUsers', JSON.stringify(users)); closeModal('changePwdModal'); showToast('Password updated'); }
+        function logout() { localStorage.removeItem('appUser'); currentUser = null; showToast('Logged out'); startApp(); }
+        function userLogin() {
+            let phone = document.getElementById('loginPhone').value;
+            const pwd = document.getElementById('loginPassword').value;
+            if (!validateNepalPhoneNumber(phone)) {
+                showToast('Please enter valid 10-digit Nepal phone number');
+                return;
+            }
+            phone = formatPhoneNumberForStorage(phone);
+            const user = users.find(u => u.phone === phone && u.password === pwd);
+            if (user) { localStorage.setItem('appUser', JSON.stringify(user)); currentUser = user; closeModal('loginModal'); showToast(`Welcome ${user.name}!`); renderBookingTab(); }
+            else showToast('Invalid credentials');
+        }
+        function userRegister() {
+            const name = document.getElementById('regName').value;
+            let phone = document.getElementById('regPhone').value;
+            const pwd = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            if (!name || !phone || !pwd) { showToast('Fill all fields'); return; }
+            if (!validateNepalPhoneNumber(phone)) { showToast('Phone must be 10 digits starting with 98,97,96'); return; }
+            phone = formatPhoneNumberForStorage(phone);
+            if (pwd !== confirm) { showToast('Passwords do not match'); return; }
+            if (users.find(u => u.phone === phone)) { showToast('Phone already registered'); return; }
+            const newUser = { id: Date.now(), name, phone, password: pwd };
+            users.push(newUser);
+            localStorage.setItem('appUsers', JSON.stringify(users));
+            closeModal('registerModal');
+            showToast('Registration successful! Please login.');
+            showLoginModal();
+        }
+
+        if (users.length === 0) { users.push({ id: 1, name: "Demo User", phone: "9800000000", password: "1234" }); localStorage.setItem('appUsers', JSON.stringify(users)); }
+    </script>
+</body>
+
+</html>
